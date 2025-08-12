@@ -19,4 +19,11 @@ public class AccountController {
         service.createAccount(newAccount);
     }
 
+    public void findAccountById() {
+        Integer id = view.showEnterId();
+        view.showAccountDetail(
+                service.findById(id)
+        );
+    }
+
 }

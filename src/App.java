@@ -18,20 +18,25 @@ public class App {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println("""
+            try {
+                System.out.println("""
                     1. Create account
                     2. Find account by id
                     3. Transfer money
                     4. Show Transaction details
                     0. Exit""");
-            System.out.print("Enter an option: ");
-            int op = Integer.parseInt(scanner.nextLine());
+                System.out.print("Enter an option: ");
+                int op = Integer.parseInt(scanner.nextLine());
 
-            if (op == 0) break;
+                if (op == 0) break;
 
-            switch (op) {
-                case 1 -> accountController.createAccount();
-                default -> System.out.println("Invalid option!");
+                switch (op) {
+                    case 1 -> accountController.createAccount();
+                    case 2 -> accountController.findAccountById();
+                    default -> System.out.println("Invalid option!");
+                }
+            } catch (NullPointerException e) {
+                System.out.println("‼\uFE0F Error: " + e.getMessage());
             }
 
         }

@@ -1,6 +1,7 @@
 package model.service;
 
 import model.Account;
+import model.dto.AccountResponse;
 import model.repository.AccountRepository;
 
 import java.sql.SQLException;
@@ -26,6 +27,15 @@ public class AccountService {
             System.out.println("Error: " + e.getMessage());
         }
 
+    }
+
+    public AccountResponse findById(Integer id) {
+        try {
+            return repository.findById(id);
+        } catch (SQLException e) {
+            System.out.println("‼\uFE0F Error: " + e.getMessage());
+        }
+        return null;
     }
 
 }
