@@ -4,11 +4,14 @@ import model.Account;
 import model.db.DbConnection;
 import model.dto.AccountResponse;
 import model.dto.TransactionRequest;
+import model.dto.TransactionResponse;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountRepository {
 
@@ -79,6 +82,13 @@ public class AccountRepository {
     }
 
     public void transferMoney(TransactionRequest request) throws SQLException {
+        if (!existsById(request.senderId())) {
+            throw new SQLException("Sender does not exist");
+        }
+        if (!existsById(request.receiverId())) {
+            throw new SQLException("Receiver does not exist");
+        }
+
         try (Connection conn = DbConnection.getInstance()) {
             conn.setAutoCommit(false); // Start transaction process
 
@@ -139,5 +149,39 @@ public class AccountRepository {
         }
     }
 
+    public List<TransactionResponse> getAllTransactions() throws SQLException {
+        try (Connection conn = DbConnection.getInstance()) {
+            String sql = """
+                    select t.transaction_id,
+                    sender.owner_name as sender_name,
+                    receiver.owner_name as receiver_name,
+                    t.amount as transfer_amount,
+                    t.created_at as transaction_date
+                    from transactions t
+                    join accounts sender
+                    on t.from_account = sender.account_id
+                    join accounts receiver
+                    on t.to_account = receiver.account_id
+                    order by t.created_at desc
+                    """;
+            try (
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery()
+            ) {
+
+                List<TransactionResponse> responses = new ArrayList<>();
+                while (rs.next()) {
+                    responses.add(new TransactionResponse(
+                            rs.getInt("transaction_id"),
+                            rs.getString("sender_name"),
+                            rs.getString("receiver_name"),
+                            rs.getDouble("transfer_amount"),
+                            String.valueOf(rs.getTimestamp("transaction_date"))
+                    ));
+                }
+                return responses;
+            }
+        }
+    }
 
 }

@@ -33,6 +33,8 @@ public class App {
                 switch (op) {
                     case 1 -> accountController.createAccount();
                     case 2 -> accountController.findAccountById();
+                    case 3 -> accountController.transferMoney();
+                    case 4 -> accountController.showTransactionRecords();
                     default -> System.out.println("Invalid option!");
                 }
             } catch (NullPointerException e) {

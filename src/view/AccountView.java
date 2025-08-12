@@ -2,9 +2,12 @@ package view;
 
 import model.Account;
 import model.dto.AccountResponse;
+import model.dto.TransactionRequest;
+import model.dto.TransactionResponse;
 import org.nocrala.tools.texttablefmt.BorderStyle;
 import org.nocrala.tools.texttablefmt.Table;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class AccountView {
@@ -43,4 +46,36 @@ public class AccountView {
 
         System.out.println(table.render());
     }
+
+    public TransactionRequest showTransactionRequest() {
+        System.out.print("Enter sender id: ");
+        int senderId = Integer.parseInt(SCANNER.nextLine());
+        System.out.print("Enter receiver id: ");
+        int receiverId = Integer.parseInt(SCANNER.nextLine());
+        System.out.print("Enter amount: ");
+        double amount = Double.parseDouble(SCANNER.nextLine());
+
+        return new TransactionRequest(senderId, receiverId, amount);
+    }
+
+    public void showTransactionRecords(List<TransactionResponse> responses) {
+        Table table = new Table(
+                5,
+                BorderStyle.UNICODE_BOX_DOUBLE_BORDER
+        );
+        table.addCell("ID   ");
+        table.addCell("Sender Name   ");
+        table.addCell("Receiver Name   ");
+        table.addCell("Amount   ");
+        table.addCell("Timestamp   ");
+        responses.forEach(t -> {
+            table.addCell(String.valueOf(t.id()));
+            table.addCell(t.senderName());
+            table.addCell(t.receiverName());
+            table.addCell(String.valueOf(t.amount()));
+            table.addCell(t.date());
+        });
+        System.out.println(table.render());
+    }
+
 }

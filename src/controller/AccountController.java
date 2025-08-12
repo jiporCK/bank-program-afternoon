@@ -1,6 +1,7 @@
 package controller;
 
 import model.Account;
+import model.dto.TransactionRequest;
 import model.service.AccountService;
 import view.AccountView;
 
@@ -23,6 +24,17 @@ public class AccountController {
         Integer id = view.showEnterId();
         view.showAccountDetail(
                 service.findById(id)
+        );
+    }
+
+    public void transferMoney() {
+        TransactionRequest request = view.showTransactionRequest();
+        service.transferMoney(request);
+    }
+
+    public void showTransactionRecords() {
+        view.showTransactionRecords(
+                service.getAllTransactions()
         );
     }
 

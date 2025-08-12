@@ -2,9 +2,12 @@ package model.service;
 
 import model.Account;
 import model.dto.AccountResponse;
+import model.dto.TransactionRequest;
+import model.dto.TransactionResponse;
 import model.repository.AccountRepository;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class AccountService {
 
@@ -34,6 +37,26 @@ public class AccountService {
             return repository.findById(id);
         } catch (SQLException e) {
             System.out.println("‼\uFE0F Error: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public void transferMoney(TransactionRequest request) {
+        if (request.amount() < 0) {
+            throw new RuntimeException("Amount must be greater than 0");
+        }
+        try {
+            repository.transferMoney(request);
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public List<TransactionResponse> getAllTransactions() {
+        try {
+            return repository.getAllTransactions();
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
         }
         return null;
     }
