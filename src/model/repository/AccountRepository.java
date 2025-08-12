@@ -3,6 +3,7 @@ package model.repository;
 import model.Account;
 import model.db.DbConnection;
 import model.dto.AccountResponse;
+import model.dto.TransactionRequest;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -76,5 +77,67 @@ public class AccountRepository {
             }
         }
     }
+
+    public void transferMoney(TransactionRequest request) throws SQLException {
+        try (Connection conn = DbConnection.getInstance()) {
+            conn.setAutoCommit(false); // Start transaction process
+
+            try {
+                // Deduct money from sender account
+                String sql = """
+                        update accounts
+                        set balance = balance - ?
+                        where account_id = ?
+                        """;
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setDouble(1, request.amount());
+                    ps.setInt(2, request.senderId());
+                    int rowsAffected = ps.executeUpdate();
+                    if (rowsAffected == 0) {
+                        throw new SQLException("Error sending money");
+                    }
+                }
+
+                // Deduct money from sender account
+                String sql2 = """
+                        update accounts
+                        set balance = balance + ?
+                        where account_id = ?
+                        """;
+                try (PreparedStatement ps = conn.prepareStatement(sql2)) {
+                    ps.setDouble(1, request.amount());
+                    ps.setInt(2, request.receiverId());
+                    int rowsAffected = ps.executeUpdate();
+                    if (rowsAffected == 0) {
+                        throw new SQLException("Error receiving money");
+                    }
+                }
+
+                // Save transaction record
+                String sql3 = """
+                        insert into transactions (from_account, to_account, amount)
+                        values (?, ?, ?)
+                        """;
+                try (PreparedStatement ps = conn.prepareStatement(sql3)) {
+                    ps.setInt(1, request.senderId());
+                    ps.setInt(2, request.receiverId());
+                    ps.setDouble(3, request.amount());
+                    int rowsAffected = ps.executeUpdate();
+                    if (rowsAffected == 0) {
+                        throw new SQLException("Error saving transaction record");
+                    }
+                }
+                conn.commit();
+
+            } catch (SQLException e) {
+                conn.rollback();
+                System.out.println(e.getMessage());
+            } finally {
+                conn.setAutoCommit(true);
+            }
+
+        }
+    }
+
 
 }
