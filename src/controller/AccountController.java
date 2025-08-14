@@ -6,12 +6,12 @@ import model.service.AccountService;
 import view.AccountView;
 
 public class AccountController {
-
+//
 //    private final AccountView view;
 //    private final AccountService service;
 //
 //    public AccountController(AccountView view, AccountService service) {
-        this.view = view;
+//        this.view = view;
         this.service = service;
     }
 
